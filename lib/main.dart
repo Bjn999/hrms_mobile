@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/constants/app_strings.dart';
 import 'core/di/injection_container.dart' as di;
@@ -10,6 +11,13 @@ import 'features/auth/presentation/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load Environment Variables (.env)
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (_) {
+    // Graceful fallback if .env is not present
+  }
 
   // Set preferred screen orientations (Portrait)
   await SystemChrome.setPreferredOrientations([
