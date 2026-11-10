@@ -146,6 +146,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
     DateTime toDate = DateTime.now().add(const Duration(days: 2));
     final reasonController = TextEditingController();
     bool isSubmitting = false;
+    String? formError;
 
     showModalBottomSheet(
       context: context,
@@ -195,6 +196,35 @@ class _VacationsScreenState extends State<VacationsScreen> {
                       ],
                     ),
                     const Divider(height: 20),
+
+                    if (formError != null) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                formError!,
+                                style: const TextStyle(
+                                  color: AppColors.error,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
 
                     const Text(
                       'نوع الإجازة',
@@ -396,7 +426,10 @@ class _VacationsScreenState extends State<VacationsScreen> {
                       onPressed: isSubmitting
                           ? null
                           : () async {
-                              setSheetState(() => isSubmitting = true);
+                              setSheetState(() {
+                                isSubmitting = true;
+                                formError = null;
+                              });
                               try {
                                 final res = await _repository.createVacationRequest(
                                   vacationTypeId: selectedTypeId,
@@ -413,14 +446,24 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                 );
                                 await _loadData();
                               } on ServerException catch (e) {
-                                setSheetState(() => isSubmitting = false);
+                                setSheetState(() {
+                                  isSubmitting = false;
+                                  formError = e.message;
+                                });
                                 _showSnackBar(e.message, isError: true);
                               } on NetworkException catch (e) {
-                                setSheetState(() => isSubmitting = false);
+                                setSheetState(() {
+                                  isSubmitting = false;
+                                  formError = e.message;
+                                });
                                 _showSnackBar(e.message, isError: true);
                               } catch (_) {
-                                setSheetState(() => isSubmitting = false);
-                                _showSnackBar('تعذر إرسال الطلب', isError: true);
+                                const msg = 'تعذر إرسال الطلب، يرجى المحاولة لاحقاً';
+                                setSheetState(() {
+                                  isSubmitting = false;
+                                  formError = msg;
+                                });
+                                _showSnackBar(msg, isError: true);
                               }
                             },
                       icon: isSubmitting

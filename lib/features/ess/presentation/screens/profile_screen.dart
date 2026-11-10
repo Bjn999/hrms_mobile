@@ -9,7 +9,6 @@ import '../../../../core/storage/secure_storage_service.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
-import '../../../auth/presentation/widgets/server_config_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserEntity user;
@@ -529,27 +528,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onChanged: _toggleBiometrics,
                     ),
                   ],
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.dns_outlined,
-                        color: AppColors.info),
-                    title: const Text(
-                      AppStrings.serverSettings,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: const Text(
-                      'تعديل عنوان خادم الـ API للربط الشبكي',
-                      style: TextStyle(fontSize: 11.5),
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      ServerConfigDialog.show(
-                        context,
-                        storageService: _storageService,
-                        onSaved: () {},
-                      );
-                    },
-                  ),
                   const Divider(height: 1),
                   ListTile(
                     leading:

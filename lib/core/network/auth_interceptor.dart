@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../constants/api_endpoints.dart';
 import '../storage/secure_storage_service.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -11,10 +12,9 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // 1. Dynamic base URL if stored
-    final baseUrl = await _storageService.getBaseUrl();
+    // 1. Base URL strictly from .env
     if (!options.path.startsWith('http')) {
-      options.baseUrl = baseUrl;
+      options.baseUrl = ApiEndpoints.defaultBaseUrl;
     }
 
     // 2. Add Standard Headers

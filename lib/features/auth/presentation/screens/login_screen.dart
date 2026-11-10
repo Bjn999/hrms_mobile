@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/di/injection_container.dart' as di;
-import '../../../../core/storage/secure_storage_service.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/biometric_prompt_dialog.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
-import '../widgets/server_config_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -115,33 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
                     child: Column(
                       children: [
-                        // Top Action Bar (Server Config)
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: IconButton(
-                            icon: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.settings_outlined,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                            tooltip: AppStrings.serverSettings,
-                            onPressed: () {
-                              ServerConfigDialog.show(
-                                context,
-                                storageService: di.sl<SecureStorageService>(),
-                                onSaved: () {},
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         // Logo Icon
                         Container(
                           padding: const EdgeInsets.all(18),
