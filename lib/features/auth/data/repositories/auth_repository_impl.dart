@@ -94,25 +94,27 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    // Check cached user first
-    final localUser = await localDataSource.getUser();
-    if (localUser != null) {
-      return localUser;
+    final token = await localDataSource.getToken();
+    if (token == null || token.isEmpty) {
+      return null;
     }
 
-    // Try fetching fresh profile from backend if token exists
-    final token = await localDataSource.getToken();
-    if (token != null && token.isNotEmpty) {
-      try {
-        final remoteUser = await remoteDataSource.getUserProfile();
-        await localDataSource.saveUser(remoteUser);
-        return remoteUser;
-      } catch (_) {
+    // Try fetching fresh profile from backend to verify token validity and get latest user info
+    try {
+      final remoteUser = await remoteDataSource.getUserProfile();
+      await localDataSource.saveUser(remoteUser);
+      return remoteUser;
+    } on ServerException catch (e) {
+      if (e.statusCode == 401 || e.statusCode == 403) {
+        await localDataSource.clearSession();
         return null;
       }
+      // On other server errors, fallback to cached user
+      return await localDataSource.getUser();
+    } catch (_) {
+      // Offline fallback to cached user
+      return await localDataSource.getUser();
     }
-
-    return null;
   }
 
   @override
@@ -132,9 +134,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> setBiometricEnabled(bool enabled) async {
+  Future<void> setBiometricEnabled(
+    bool enabled, {
+    String? username,
+    String? password,
+  }) async {
     await localDataSource.setBiometricEnabled(enabled);
-    if (!enabled) {
+    if (enabled && username != null && password != null) {
+      await localDataSource.saveCredentials(
+        username: username,
+        password: password,
+      );
+    } else if (!enabled) {
       await localDataSource.clearSavedCredentials();
     }
   }
@@ -144,5 +155,44 @@ class AuthRepositoryImpl implements AuthRepository {
     final isEnabled = await localDataSource.isBiometricEnabled();
     final credentials = await localDataSource.getSavedCredentials();
     return isEnabled && credentials != null;
+  }
+
+  @override
+  Future<UserEntity> updateProfile({
+    String? email,
+    String? username,
+    String? password,
+    String? passwordConfirmation,
+    String? phone,
+    String? address,
+  }) async {
+    final updatedUser = await remoteDataSource.updateProfile(
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+      phone: phone,
+      address: address,
+    );
+    await localDataSource.saveUser(updatedUser);
+
+    // If biometric credentials were saved and username or password changed, update them
+    if (await localDataSource.isBiometricEnabled()) {
+      final creds = await localDataSource.getSavedCredentials();
+      if (creds != null) {
+        final newUsername = (username != null && username.trim().isNotEmpty)
+            ? username.trim()
+            : creds['username']!;
+        final newPassword = (password != null && password.isNotEmpty)
+            ? password
+            : creds['password']!;
+        await localDataSource.saveCredentials(
+          username: newUsername,
+          password: newPassword,
+        );
+      }
+    }
+
+    return updatedUser;
   }
 }

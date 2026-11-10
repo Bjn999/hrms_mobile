@@ -6,6 +6,7 @@ class EmployeeEntity extends Equatable {
   final String name;
   final String? email;
   final String? phone;
+  final String? address;
   final String? jobTitle;
   final String? department;
   final String? branch;
@@ -17,6 +18,7 @@ class EmployeeEntity extends Equatable {
     required this.name,
     this.email,
     this.phone,
+    this.address,
     this.jobTitle,
     this.department,
     this.branch,
@@ -30,6 +32,7 @@ class EmployeeEntity extends Equatable {
         name,
         email,
         phone,
+        address,
         jobTitle,
         department,
         branch,

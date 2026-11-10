@@ -33,9 +33,15 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.response?.statusCode == 401) {
-      // Session expired or token invalid - token cleanup
-      _storageService.deleteToken();
+    final statusCode = err.response?.statusCode;
+    final data = err.response?.data;
+    final isSubscriptionSuspended = statusCode == 403 &&
+        data is Map &&
+        data['error_code'] == 'SUBSCRIPTION_SUSPENDED';
+
+    if (statusCode == 401 || isSubscriptionSuspended) {
+      // Session expired, token invalid, or company subscription suspended
+      _storageService.clearAllSession();
     }
     return handler.next(err);
   }

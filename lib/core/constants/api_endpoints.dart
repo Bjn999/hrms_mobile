@@ -6,11 +6,12 @@ class ApiEndpoints {
     return dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:8000/api';
   }
   
-  // Auth Endpoints
+  // Auth & Dashboard Endpoints
   static const String login = '/login';
   static const String logout = '/logout';
   static const String userProfile = '/user';
   static const String updateProfile = '/profile/update';
+  static const String personalDashboard = '/user/personal-dashboard';
 
   // Attendance Endpoints
   static const String todayAttendance = '/user/attendance/today';
@@ -21,8 +22,12 @@ class ApiEndpoints {
   static const String vacationTypes = '/user/vacation-types';
   static const String myVacations = '/user/my-vacations';
   static const String requestVacation = '/user/vacation-requests';
+  static String cancelVacation(int id) => '/user/vacation-requests/$id/cancel';
 
   // Notifications
   static const String notifications = '/notifications';
   static const String unreadNotificationsCount = '/notifications/unread-count';
+  static String markNotificationRead(String id) => '/notifications/$id/mark-as-read';
+  static const String markAllNotificationsRead = '/notifications/mark-all-read';
+  static String deleteNotification(String id) => '/notifications/$id';
 }

@@ -82,11 +82,29 @@ class AuthCubit extends Cubit<AuthState> {
         promptBiometrics: shouldPrompt,
       ));
     } on ServerException catch (e) {
+      final canBiometrics = await authRepository.isBiometricAvailable();
+      final hasSaved = await authRepository.hasSavedCredentials();
       emit(AuthError(e.message));
+      emit(Unauthenticated(
+        canUseBiometrics: canBiometrics,
+        hasSavedCredentials: hasSaved,
+      ));
     } on NetworkException catch (e) {
+      final canBiometrics = await authRepository.isBiometricAvailable();
+      final hasSaved = await authRepository.hasSavedCredentials();
       emit(AuthError(e.message));
+      emit(Unauthenticated(
+        canUseBiometrics: canBiometrics,
+        hasSavedCredentials: hasSaved,
+      ));
     } catch (e) {
+      final canBiometrics = await authRepository.isBiometricAvailable();
+      final hasSaved = await authRepository.hasSavedCredentials();
       emit(AuthError('فشل تسجيل الدخول: ${e.toString()}'));
+      emit(Unauthenticated(
+        canUseBiometrics: canBiometrics,
+        hasSavedCredentials: hasSaved,
+      ));
     }
   }
 
@@ -122,16 +140,47 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Enable or disable biometric authentication
+  /// Enable or disable biometric authentication without re-triggering a full network login
   Future<void> setBiometrics(bool enabled, {String? username, String? password}) async {
-    if (enabled && username != null && password != null) {
-      await authRepository.login(
-        username: username,
-        password: password,
-        rememberForBiometrics: true,
-      );
+    await authRepository.setBiometricEnabled(
+      enabled,
+      username: username,
+      password: password,
+    );
+  }
+
+  /// Update authenticated user profile and sync state
+  Future<void> updateUserProfile({
+    String? email,
+    String? username,
+    String? password,
+    String? passwordConfirmation,
+    String? phone,
+    String? address,
+  }) async {
+    final currentState = state;
+    final updatedUser = await authRepository.updateProfile(
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+      phone: phone,
+      address: address,
+    );
+
+    if (currentState is Authenticated) {
+      emit(Authenticated(
+        user: updatedUser,
+        token: currentState.token,
+        role: updatedUser.role,
+        permissions: currentState.permissions,
+      ));
     } else {
-      await authRepository.setBiometricEnabled(enabled);
+      emit(Authenticated(
+        user: updatedUser,
+        token: '',
+        role: updatedUser.role,
+      ));
     }
   }
 

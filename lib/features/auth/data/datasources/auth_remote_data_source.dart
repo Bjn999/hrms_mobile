@@ -12,6 +12,15 @@ abstract class AuthRemoteDataSource {
   Future<void> logout();
 
   Future<UserModel> getUserProfile();
+
+  Future<UserModel> updateProfile({
+    String? email,
+    String? username,
+    String? password,
+    String? passwordConfirmation,
+    String? phone,
+    String? address,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -29,6 +38,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {
         'username': username,
         'password': password,
+        'device_name': 'hrms_mobile_app',
       },
     );
 
@@ -43,6 +53,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> getUserProfile() async {
     final response = await client.get(ApiEndpoints.userProfile);
+    final data = response.data['data'] as Map<String, dynamic>;
+    return UserModel.fromJson(data);
+  }
+
+  @override
+  Future<UserModel> updateProfile({
+    String? email,
+    String? username,
+    String? password,
+    String? passwordConfirmation,
+    String? phone,
+    String? address,
+  }) async {
+    final payload = <String, dynamic>{};
+    if (email != null && email.trim().isNotEmpty) payload['email'] = email.trim();
+    if (username != null && username.trim().isNotEmpty) payload['username'] = username.trim();
+    if (password != null && password.isNotEmpty) {
+      payload['password'] = password;
+      payload['password_confirmation'] = passwordConfirmation ?? password;
+    }
+    if (phone != null) payload['emp_home_tel'] = phone.trim();
+    if (address != null) payload['staies_address'] = address.trim();
+
+    final response = await client.put(
+      ApiEndpoints.updateProfile,
+      data: payload,
+    );
     final data = response.data['data'] as Map<String, dynamic>;
     return UserModel.fromJson(data);
   }

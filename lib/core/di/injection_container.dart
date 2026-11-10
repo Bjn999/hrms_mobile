@@ -10,6 +10,7 @@ import '../../features/auth/domain/usecases/check_auth_status_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/ess/data/ess_repository.dart';
 import '../network/dio_client.dart';
 import '../services/biometric_service.dart';
 import '../storage/secure_storage_service.dart';
@@ -63,6 +64,10 @@ Future<void> initDependencies() async {
       localDataSource: sl(),
       biometricService: sl(),
     ),
+  );
+
+  sl.registerLazySingleton<EssRepository>(
+    () => EssRepository(client: sl()),
   );
 
   // -------------------------------------------------------------

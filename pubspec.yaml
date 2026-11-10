@@ -54,6 +54,7 @@ dependencies:
   shared_preferences: ^2.5.2
   local_auth: ^2.3.0
   flutter_dotenv: ^5.2.1
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:

@@ -7,6 +7,7 @@ class EmployeeModel extends EmployeeEntity {
     required super.name,
     super.email,
     super.phone,
+    super.address,
     super.jobTitle,
     super.department,
     super.branch,
@@ -24,7 +25,10 @@ class EmployeeModel extends EmployeeEntity {
       name: json['emp_name']?.toString() ?? json['name']?.toString() ?? '',
       email: json['emp_email']?.toString() ?? json['email']?.toString(),
       phone: json['emp_home_tel']?.toString() ?? json['phone']?.toString(),
-      jobTitle: json['job_category']?['name']?.toString() ?? json['job_title']?.toString(),
+      address: json['staies_address']?.toString() ?? json['address']?.toString(),
+      jobTitle: json['job']?['name']?.toString() ??
+          json['job_category']?['name']?.toString() ??
+          json['job_title']?.toString(),
       department: json['department']?['name']?.toString() ?? json['department_name']?.toString(),
       branch: json['branch']?['name']?.toString() ?? json['branch_name']?.toString(),
       photoUrl: json['image_path']?.toString() ?? json['photo']?.toString(),
@@ -38,6 +42,7 @@ class EmployeeModel extends EmployeeEntity {
       'emp_name': name,
       'emp_email': email,
       'emp_home_tel': phone,
+      'staies_address': address,
       'job_title': jobTitle,
       'department_name': department,
       'branch_name': branch,

@@ -66,5 +66,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>يستخدم التطبيق بصمة الوجه (Face ID) لتسجيل الدخول السريع وتأكيد الهوية عند تسجيل الحضور والانصراف.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>يحتاج التطبيق إلى موقعك الجغرافي للتحقق من تواجدك داخل النطاق الجغرافي لفرع العمل عند تسجيل الحضور والانصراف.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>يحتاج التطبيق إلى موقعك الجغرافي للتحقق من تواجدك داخل النطاق الجغرافي لفرع العمل عند تسجيل الحضور والانصراف.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
